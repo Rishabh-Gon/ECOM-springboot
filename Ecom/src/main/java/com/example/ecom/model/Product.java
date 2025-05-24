@@ -19,6 +19,8 @@ public class Product {
 	
 	private String name;
 	
+	private String imgp;
+	
 	private double price;
 	
 	private int quantity;
@@ -41,6 +43,14 @@ public class Product {
 
 	public int getId() {
 		return id;
+	}
+
+	public String getImgp() {
+		return imgp;
+	}
+
+	public void setImgp(String imgp) {
+		this.imgp = imgp;
 	}
 
 	public Seller getSeller() {

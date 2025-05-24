@@ -8,4 +8,5 @@ import com.example.ecom.model.Orderhist;
 
 public interface OrderhistRepo extends JpaRepository<Orderhist, Integer> {
 	List<Orderhist> findByCustid(int custid);
+	Orderhist findById(int id);
 }

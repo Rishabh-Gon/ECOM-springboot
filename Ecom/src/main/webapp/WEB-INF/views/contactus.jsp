@@ -8,7 +8,7 @@
     </head>
     <body style="background-image: url(images/shop.jpg)">
         <h1 style="text-align: center; margin-top: 0; margin-bottom: 0; color: yellow; background: black">
-            Welcome to Our E-commerce Store
+            Welcome to SwiftMart
         </h1>
         <table style="margin-left: auto; margin-top: 0; margin-bottom: 0">
         	<tr>
@@ -42,6 +42,10 @@
             Phone:9062393675
             <br>
             E-mail:gonrishabh@gmail.com
+            <br>
+            Phone:8697255425
+            <br>
+            E-mail:sushantachowdhury24@gmail.com
             </p>
         </div>
     </body>

@@ -8,19 +8,20 @@
     <head>
         <meta charset="UTF-8">
         <title>ADMIN HOME</title>
+        <link rel="stylesheet" href="style1.css" />
     </head>
     	<%
     	Admin admi=(Admin)session.getAttribute("admin");
     	%>
         <body style="background-image: url(images/shop.jpg)">         
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
-            <h1>Welcome Admin <%=admi.getUsername() %></h1>
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, Admin <%=admi.getUsername()%></h2>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; 
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; 
              background-color: white; flex-direction: column; 
-             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
+             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
             <th style="justify-content: center; text-align: justify; padding: 5px; background-color: black; 
@@ -43,6 +44,12 @@
             </th>
             <th style="justify-content: center;text-align: justify;padding: 5px; background-color: #c0c0c0; 
                 border-top-left-radius: 20px; border-top-right-radius: 20px; border: 1px solid black">
+                <a href="productlist" style="color: black; text-decoration: none;">
+                <b>Selling Products</b>
+                </a>
+            </th>
+            <th style="justify-content: center;text-align: justify;padding: 5px; background-color: #c0c0c0; 
+                border-top-left-radius: 20px; border-top-right-radius: 20px; border: 1px solid black">
                 <a href="orderslist" style="color: black; text-decoration: none;">
                 <b>Orders</b>
                 </a>
@@ -56,7 +63,8 @@
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center;text-align: justify;padding: 5px;
-                 background-color: black; color: yellow; width: 940px ">
+                 background-color: black; color: yellow; width: 1204px ">
+                 <section class="products">
                 <%
                     List<Seller> perm_pd=(List<Seller>)request.getAttribute("perm_seller");
                     if(perm_pd.isEmpty()){
@@ -64,61 +72,33 @@
                     No objects present now
                 <%
                     }else{
-                %>
-                <table style="border: 2px solid yellow; font-size: 48 px; border-radius: 5px; border-color: yellow; 
-                             background-color: black; text-align: center; color:yellow; justify-content: center;">
-                    <tr>
-                    <th style="background-color: yellow; color: black">SELLER ID</th>
-                    <th style="background-color: yellow; color: black">SELLER NAME</th>
-                    <th style="background-color: yellow; color: black">SELLER MAIL</th>
-                    <th style="background-color: yellow; color: black">SELLER DETAILS</th>
-                    <th style="background-color: yellow; color: black">PERMISSION</th>
-                    </tr>
-                <%
                     for(Seller x: perm_pd) {
                         String p_name=x.getName();
                         String p_id=String.valueOf(x.getId());
                         String p_mail=x.getEmail();
-                %>     
-                            <tr>
-                                <td><%=p_id%></td>
-                                <td><%=p_name%></td>
-                                <td><%=p_mail%></td>
-                                <td>
-                                    <form action="seller_det" method="post" style="font-size: 15px;">   
-                                        <div style="align-items: center">                                            
-                                            <input type="hidden" name="sellr_id" value="<%=p_id%>">
-                                            <input type="hidden" name="page" value="adminhome">
-                                            <button type="submit"                                         
-                                                    style="padding: 10px; background: yellow; color: black;
-                                                    border: none; border-radius: 5px;">
-                                                <b>See Details</b>
-                                            </button>                                           
-                                        </div>
-                                    </form>
-                                </td>
-                                <td>
-                                    <form action="Remsellerperm" method="post" style="font-size: 15px;">   
-                                        <div style="align-items: center">                                            
-                                            <input type="hidden" name="sellr_id" value="<%=p_id%>">
-                                            <button type="submit"                                         
-                                                    style="padding: 10px; background: yellow; color: black;
-                                                    border: none; border-radius: 5px;">
-                                                <b>Remove permission</b>
-                                            </button>                                           
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>        
+                %>
+                <div class="product-card">
+			        <h3><%=p_name%></h3>
+			        <p><%=p_mail%></p>
+			        <span class="price">ID-<%=p_id%></span>
+			        <div class="button-group">
+			        	<form action="seller_det" method="post">   
+	                           <input type="hidden" name="sellr_id" value="<%=p_id%>">
+                               <input type="hidden" name="page" value="adminhome">
+	                     		<button type="submit" class="add-cart">Details</button>      
+	                       </form>
+	                    <form action="Remsellerperm" method="post">   
+	                               <input type="hidden" name="sellr_id" value="<%=p_id%>">
+	                     			<button type="submit" class="buy-now">Remove</button>          
+	                       </form>
+			        </div>
+			      </div>        
                 <%
                         }
                     }
                 %>
-                </table>
+                </section>
             </div>
         </div>
         </body>    
-        <%--
-        }
-        --%>
 </html>

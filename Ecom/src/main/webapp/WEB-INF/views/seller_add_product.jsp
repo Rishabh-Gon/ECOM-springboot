@@ -15,7 +15,7 @@
         if(sellrperm.equals("NO")){
         %>
         <body>  
-        <h1>Welcome <%=sellrname%></h1>
+        <h1>Welcome to SwiftMart, <%=sellrname%></h1>
         <h2>Your request to do business is being evaluated. Contact with admin.</h2>
         <form action="Logout" method="post" style="font-size: 15px;">   
             <div style="align-items: center; margin-left: 250px">                       
@@ -28,14 +28,14 @@
         }else{
         %>
         <body style="background-image: url(images/shop.jpg)">
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 810px">
-            <h1>Welcome <%=sellrname%></h1>
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, <%=sellrname%></h2>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; 
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; 
              background-color: white; flex-direction: column; 
-             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 810px">
+             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
             <th style="justify-content: center; text-align: justify; padding: 5px; background-color: #c0c0c0; 
@@ -65,10 +65,13 @@
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center; padding: 5px;
-                 background-color: black; color: yellow; width: 800px ">
-                <form action="RegisterProduct" method="post" style="font-size: 15px;">   
+                 background-color: black; color: yellow; width: 1204px ">
+				<form action="RegisterProduct" method="post" enctype="multipart/form-data" style="font-size: 15px;"> 
                     <div style="align-items: center; margin-left: 250px">
                         <br>
+					    Product Image<br>
+					    <input type="file" name="product_image" accept="image/*" required 
+					           style="width: 200px; padding: 10px; margin: 10px 0;"><br>
                         Product Name<br>
                         <input type="text" name="prod_name" placeholder="Product Name" required 
                         style="width: 200px; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;"><br>

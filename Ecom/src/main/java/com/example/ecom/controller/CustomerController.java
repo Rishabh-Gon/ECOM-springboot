@@ -1,13 +1,23 @@
 package com.example.ecom.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.ecom.model.Customer;
 import com.example.ecom.model.Orderhist;
@@ -59,6 +69,50 @@ public class CustomerController {
 		return "customerhome";
 	}
 	
+	public boolean validEmail(String mail) {
+	    if (mail == null || mail.isEmpty()) {
+	        return false;
+	    }
+
+	    // Allowed email domains
+	    String[] allowedDomains = {"gmail.com", "rediffmail.com", "yahoomail.com"};
+
+	    // Split the email into two parts: local part and domain part
+	    int atIndex = mail.lastIndexOf('@');
+	    if (atIndex <= 0 || atIndex == mail.length() - 1) {
+	        return false; // Invalid if @ is missing, at the start, or end
+	    }
+
+	    String localPart = mail.substring(0, atIndex);
+	    String domainPart = mail.substring(atIndex + 1);
+
+	    // Check if domain is in the allowed list
+	    boolean isDomainValid = false;
+	    for (String domain : allowedDomains) {
+	        if (domain.equalsIgnoreCase(domainPart)) {
+	            isDomainValid = true;
+	            break;
+	        }
+	    }
+
+	    if (!isDomainValid) {
+	        return false;
+	    }
+
+	    return localPart.matches("^[A-Za-z0-9._%+-]+$");
+	}
+	
+	@GetMapping("/product-qty")
+	@ResponseBody
+	public Map<Integer, Integer> getProductQuantities() {
+	    List<Product> products = prepo.findByPerm("YES");
+	    Map<Integer, Integer> qtyMap = new HashMap<>();
+	    for (Product p : products) {
+	        qtyMap.put(p.getId(), p.getQuantity());
+	    }
+	    return qtyMap;
+	}
+	
 	@RequestMapping("/custcart")
 	public String custcart(HttpSession session, HttpServletRequest request) {
 		int cid=((Customer)session.getAttribute("customer")).getId();
@@ -83,18 +137,41 @@ public class CustomerController {
 	    return "redirect:/customerhome";
 	}
 	
+	// Single buying on front page
 	@Transactional
 	@RequestMapping("/Buynowsingle")
 	public String Buynowsingle(@RequestParam("product_id")int pid,HttpSession session) {
 		Customer c=(Customer)session.getAttribute("customer");
 		Product p=(Product)prepo.findById(pid);
 		int updated = prepo.atomicBuyCheck(pid, 1, p.getPrice());
+		Orderhist ordhstobj;
 		if(updated==1) {
-			ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), 1,p.getPrice(),0.0));
+			ordhstobj=ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), 1,p.getPrice(),0.0,p.getId()));
 		}
 		else {
-			ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), 1,0.0,p.getPrice()));
+			ordhstobj=ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), 1,0.0,p.getPrice(),p.getId()));
 		}
+		//image path from database
+        String dbImagePath = "C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp"+p.getImgp();
+
+        // Desired destination folder
+        String destDir = "C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp\\ordimages";
+
+        // New file name
+        String newFileName ="oimg" + ordhstobj.getId() + "." +p.getImgp().substring(p.getImgp().lastIndexOf(".") + 1);
+
+        // Define source and target paths
+        Path sourcePath = Paths.get(dbImagePath);
+        Path targetPath = Paths.get(destDir, newFileName);
+
+        // Copy the file (replace if exists)
+        try {
+			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			return "redirect:/custordrhist";
+		}
+        ordhstobj.setOimg("/ordimages/"+newFileName);
+        ordhist.save(ordhstobj);
 		return "redirect:/custordrhist";
 	}
 	
@@ -103,16 +180,39 @@ public class CustomerController {
 	public String Buynowset(@RequestParam("cust_id")int cid,HttpSession session) {
 		List<Orderprod> cl=orepo.findByCustomerId(cid);
 		Customer c=(Customer)session.getAttribute("customer");
+		Orderhist ordhstobj;
 		for(Orderprod x: cl) {			
 			Product p=x.getProduct();
 			int updated = prepo.atomicBuyCheck(p.getId(), x.getQty(), (x.getQty()*p.getPrice()));
 			if(updated==1) {
-				ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), x.getQty(),(p.getPrice()*x.getQty()),0.0));
+				ordhstobj=ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), x.getQty(),(p.getPrice()*x.getQty()),0.0,p.getId()));
 				orepo.delete(x);
 			}
 			else {
-				ordhist.save(new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), x.getQty(),0.0,(p.getPrice()*x.getQty())));				
+				ordhstobj=new Orderhist(p.getName(), p.getPrice(), p.getPd(), p.getSeller().getName(), c.getName(), p.getSeller().getId(), c.getId(), x.getQty(),0.0,(p.getPrice()*x.getQty()),p.getId());
+				ordhstobj=ordhist.save(ordhstobj);
 			}
+			//image path from database
+	        String dbImagePath = "C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp"+p.getImgp();
+
+	        // Desired destination folder
+	        String destDir = "C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp\\ordimages";
+
+	        // New file name
+	        String newFileName ="oimg" + ordhstobj.getId() + "." +p.getImgp().substring(p.getImgp().lastIndexOf(".") + 1);
+
+	        // Define source and target paths
+	        Path sourcePath = Paths.get(dbImagePath);
+	        Path targetPath = Paths.get(destDir, newFileName);
+
+	        // Copy the file (replace if exists)
+	        try {
+				Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				return "redirect:/custordrhist";
+			}
+	        ordhstobj.setOimg("/ordimages/"+newFileName);
+	        ordhist.save(ordhstobj);
 		}
 		return "redirect:/custordrhist";
 	}
@@ -124,6 +224,14 @@ public class CustomerController {
 		Collections.reverse(p);
 		request.setAttribute("ordhist",p);		
 		return "custordrhist";
+	}
+	
+	@RequestMapping("/cancelord")
+	public String cancelord(@RequestParam("orderhist_id")int ohid) {
+		Orderhist ordhstobj=ordhist.findById(ohid);
+		ordhstobj.setOrderstatus("appeal");
+		ordhist.save(ordhstobj);
+		return "redirect:/custordrhist";
 	}
 	
 	@RequestMapping("/Addprodcartval")
@@ -159,9 +267,12 @@ public class CustomerController {
 		else if(crepo.existsByEmail(cmail)) {								//email already exists
 			model.addAttribute("msg", "mxstfail");
 		}
-		//else if() {									//email format may not be correct		
-		//}
+		else if(validEmail(cmail)== false) {
+			model.addAttribute("msg", "emfail");		
+		}
 		else {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(5);
+			cpass=encoder.encode(cpass);
 			Customer c=new Customer(cname,cmail, cpass);
 			crepo.save(c); 			
 			model.addAttribute("msg", "success");
@@ -174,14 +285,15 @@ public class CustomerController {
 			@RequestParam("cust_password")String cpass, ModelMap model,
 			HttpSession session, HttpServletRequest request) 
 	{
-		Customer cust=crepo.findByEmailAndPassword(cmail,cpass);
-		if(cust!=null) {	
-			session.setAttribute("customer", cust); 
-		    return "redirect:/customerhome";
+		Customer cust=crepo.findByEmail(cmail);
+		if(cust!=null) {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(5);
+			if (encoder.matches(cpass, cust.getPassword())) {
+				session.setAttribute("customer", cust); 
+			    return "redirect:/customerhome";
+			}
 		}
-		else {
-			model.addAttribute("msg", "clfail");
-		}
+		model.addAttribute("msg", "clfail");
 		return "customer_login";		
 	}
 	

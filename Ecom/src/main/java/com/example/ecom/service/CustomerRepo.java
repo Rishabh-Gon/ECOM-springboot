@@ -7,5 +7,5 @@ import com.example.ecom.model.Customer;
 public interface CustomerRepo extends JpaRepository<Customer, Integer> {
 	Customer findById(int id);
 	boolean existsByEmail(String email);
-	Customer findByEmailAndPassword(String email,String password);
+	Customer findByEmail(String email);
 }

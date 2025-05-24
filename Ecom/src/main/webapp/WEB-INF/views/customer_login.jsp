@@ -8,7 +8,7 @@
     </head>
     <body style="background-image: url(images/shop.jpg)">
         <h1 style="text-align: center; margin-top: 0; margin-bottom: 0; color: yellow; background: black">
-            Welcome to Our E-commerce Store
+            Welcome to SwiftMart
         </h1>
         <div style="display: flex; justify-content: center; align-items: left; font-size: 16px; 
              padding: 20px 40px; border-top-left-radius: 20px; border-top-right-radius: 20px; background-color: white;

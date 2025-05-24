@@ -16,7 +16,10 @@
              padding: 20px 40px; padding-top: 0px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; 
              background-color: white; flex-direction: column; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 800px">
             <h2>Register Seller</h2>
-            <form action="RegisterSeller" method="post">
+            <form action="RegisterSeller" method="post" enctype="multipart/form-data">
+             <div style="font-size: 15px">Upload business documents: 
+                <input type="file" name="pdfFile" accept="application/pdf" required>
+             </div>
             <div style="font-size: 15px">Name</div>
             <input type="text" name="seller_name" placeholder="Name" required 
             style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
@@ -43,6 +46,8 @@
             <%
                 }else{
                 	if(getm.equals("pfail")){showMessage="Passwords don't match";}
+                	if(getm.equals("tfail")){showMessage="Problem in uploading file. try again";}
+                	if(getm.equals("emfail")){showMessage="Invalid email";}
                 	if(getm.equals("mxstfail")){showMessage="Email is already registered with a seller account. Please Login.";}
             %>
             <p style="font-family: Arial, sans-serif; color: red; font-size: 16px; width: 450px"> 

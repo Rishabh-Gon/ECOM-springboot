@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,13 @@ public class AdminPageController {
 	
 	@Autowired
 	private OrderhistRepo ohrepo;
+	
+	@RequestMapping("/productlist")
+	public String productlist(HttpServletRequest request, HttpSession session) {
+		List<Product> prod_y_perm=prepo.findByPerm("YES");
+		request.setAttribute("prod_y_perm", prod_y_perm);		
+		return "productlist";
+	}
 
 	@RequestMapping("/Adminpage")
 	public String Adminpage() {
@@ -126,6 +134,40 @@ public class AdminPageController {
 		return "seller_det_pp";
 	}
 	
+	@RequestMapping("/seller_det_page")
+	public String seller_det_page(HttpSession session) {
+		Seller s=(Seller)session.getAttribute("sellerinfo");
+		return "seller_det_page";
+	}
+	
+	@Transactional
+	@RequestMapping("/acceptcancel")
+	public String acceptcancel(@RequestParam("orderhist_id")int ohid) {
+		Orderhist ordhstobj=ohrepo.findById(ohid);
+		Product p=prepo.findByIdAndNameAndPriceAndPd(ordhstobj.getProdid(),ordhstobj.getProductname(), ordhstobj.getProductprice(), ordhstobj.getProductdesc());
+		if(p==null) {
+			ordhstobj.setOrderstatus("cnc");
+			ohrepo.save(ordhstobj);
+			return "redirect:/orderslist";						
+		}
+		else {
+			ordhstobj.setOrderstatus("cancelled");
+			ordhstobj.setRefunded(ordhstobj.getTaken());
+			ordhstobj.setTaken(0.0);
+			prepo.safeUpdateQuantity(p.getId(), ordhstobj.getBqty());
+			ohrepo.save(ordhstobj);
+			return "redirect:/orderslist";
+		}
+	}
+	
+	@RequestMapping("/rejectcancel")
+	public String rejectcancel(@RequestParam("orderhist_id")int ohid) {
+		Orderhist ordhstobj=ohrepo.findById(ohid);
+		ordhstobj.setOrderstatus("completed");
+		ohrepo.save(ordhstobj);
+		return "redirect:/orderslist";
+	}
+	
 	@RequestMapping("/customer_det")
 	public String customer_det(@RequestParam("cust_id")int cid, 
 			HttpSession session, HttpServletRequest request) {
@@ -184,6 +226,15 @@ public class AdminPageController {
 	}
 	
 	@Transactional
+	@RequestMapping("/Remadminprodperm")
+	public String Remadminprodperm(@RequestParam("prodid")int pid) {
+		Product x=(Product)prepo.findById(pid);
+		x.setPerm("NO");
+		prepo.save(x);	
+		return "redirect:/productlist";
+	}
+	
+	@Transactional
 	@RequestMapping("/Giveprodperm")
 	public String Giveprodperm(@RequestParam("prodid")int pid) {
 		Product x=(Product)prepo.findById(pid);
@@ -199,14 +250,15 @@ public class AdminPageController {
 			@RequestParam("admin_password")String apass, ModelMap model, 
 			HttpSession session, HttpServletRequest request) 
 	{
-		Admin admi=arepo.findByUsernameAndPassword(aname, apass);
-		if(admi!=null) {		
-			session.setAttribute("admin", admi); 
-		    return "redirect:/adminhome";
+		Admin admi=arepo.findByUsername(aname);
+		if(admi!=null) {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(5);
+			if (encoder.matches(apass, admi.getPassword())) {
+		        session.setAttribute("admin", admi); 
+		        return "redirect:/adminhome";
+		    }
 		}
-		else {
-			model.addAttribute("msg", "alfail");
-		}
+		model.addAttribute("msg", "alfail");
 		return "Adminpage";
 	}
 

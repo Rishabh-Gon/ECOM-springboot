@@ -13,14 +13,14 @@
     String custname=c.getName();
     %>
     <body style="background-image: url(images/shop.jpg)">         
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 910px">
-            <h1>Welcome <%=custname%></h1>
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, <%=custname%></h2>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; 
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; 
              background-color: white; flex-direction: column; 
-             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 910px">
+             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
             <th style="justify-content: center; text-align: justify; padding: 5px; background-color: #c0c0c0; 
@@ -50,10 +50,10 @@
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center; padding: 5px;
-                 background-color: black; color: yellow; width: 900px ">
+                 background-color: black; color: yellow; width: 1204px ">
                 <form action="Logout" method="post" 
                       style="font-size: 15px;">   
-                    <div style="align-items: center; margin-left: 250px">                       
+                    <div style="justify-content:center; align-items: center; margin-left: 250px">                       
                         <button type="submit" style="width: 200px; padding: 10px; background: yellow; color: black;
                                 border: none; border-radius: 5px;"><b>Logout</b></button><br>                                           
                     </div>

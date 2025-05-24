@@ -9,7 +9,7 @@
     <body background="images/shop.jpg">
         <div >
         <h1 style="text-align: center; margin-top: 0; margin-bottom: 0; color: yellow; background: black">
-            Welcome to Our E-commerce Store
+            Welcome to SwiftMart
         </h1>
         <table style="margin-left: auto; margin-top: 0; margin-bottom: 0">
         	<tr>
@@ -39,7 +39,7 @@
         <div style="display: flex; justify-content: center; align-items: center; font-size: 24px; 
              padding: 20px 40px; border-radius: 20px; background-color: white; 
              margin-left: auto; margin-right: auto; margin-top: 71px; margin-bottom: auto; width: 800px">
-            Welcome to Our E-commerce Store! We are committed to creating a seamless, 
+            Welcome to SwiftMart. We are committed to creating a seamless, 
             user-friendly platform for buyers and sellers alike. Our goal is to connect customers 
             and sellers and provide a space 
             where customers can discover a wide variety of products, and sellers can showcase 

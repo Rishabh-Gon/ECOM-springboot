@@ -44,6 +44,7 @@
             <%
                 }else{
                 	if(getm.equals("pfail")){showMessage="Passwords don't match";}
+                	if(getm.equals("emfail")){showMessage="Invalid email";}
                 	if(getm.equals("mxstfail")){showMessage="Email is already registered with a customer account. Please Login.";}
             %>
             <p style="font-family: Arial, sans-serif; color: red; font-size: 16px; width: 450px"> 

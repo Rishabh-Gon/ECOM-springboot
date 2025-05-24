@@ -8,7 +8,7 @@
     </head>
     <body style="background-image: url(images/shop.jpg)">
         <h1 style="text-align: center; margin-top: 0; margin-bottom: 0; color: yellow; background: black">
-            Welcome to Our E-commerce Store
+            Welcome to SwiftMart
         </h1>
         <table style="margin-left: auto; margin-top: 0; margin-bottom: 0">
         	<tr>

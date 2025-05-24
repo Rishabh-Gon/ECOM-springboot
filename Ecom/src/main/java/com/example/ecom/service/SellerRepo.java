@@ -9,6 +9,6 @@ import com.example.ecom.model.Seller;
 public interface SellerRepo extends JpaRepository<Seller, Integer> {
 	List<Seller> findByPerm(String perm);
 	boolean existsByEmail(String email);
-	Seller findByEmailAndPassword(String email, String password);
+	Seller findByEmail(String email);
 	Seller findById(int id);
 }

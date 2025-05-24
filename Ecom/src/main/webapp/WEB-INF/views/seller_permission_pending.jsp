@@ -8,6 +8,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Product Permission Pending</title>
+        <link rel="stylesheet" href="style1.css" />
     </head>
     <%
         Seller c=(Seller)session.getAttribute("seller");
@@ -16,7 +17,7 @@
         if(sellrperm.equals("NO")){
         %>
         <body>  
-        <h1>Welcome <%=sellrname%></h1>
+        <h1>Welcome to SwiftMart, <%=sellrname%></h1>
         <h2>Your request to do business is being evaluated. Contact with admin.</h2>
         <form action="Logout" method="post" style="font-size: 15px;">   
             <div style="align-items: center; margin-left: 250px">                       
@@ -29,12 +30,12 @@
         }else{
         %>
         <body style="background-image: url(images/shop.jpg)">
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 810px">
-            <h1>Welcome <%=sellrname%></h1>
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, <%=sellrname%></h2>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; width: 810px;
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; width: 1214px;
         background-color: white; flex-direction: column; margin-left: auto; margin-right: auto; margin-bottom: auto;">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
@@ -65,7 +66,8 @@
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center;text-align: justify;padding: 5px;
-                 background-color: black; color: yellow; width: 800px ">
+                 background-color: black; color: yellow; width: 1204px ">
+                <section class="products">
                 <%
                 	List<Product> perm_pd=(List<Product>)request.getAttribute("prod_Wo_perm");
                     if(perm_pd.isEmpty()){
@@ -73,47 +75,34 @@
                     No objects present now
                 <%
                     }else{
-                %>
-                <table style="border: 2px solid yellow; font-size: 48 px; border-radius: 5px; border-color: yellow; 
-                             background-color: black; color:yellow; justify-content: center;">
-                    <tr>
-                    <th style="background-color: yellow; color: black">PRODUCT</th>
-                    <th style="background-color: yellow; color: black">PRICE</th>
-                    <th style="background-color: yellow; color: black">QUANTITY</th>
-                    <th style="background-color: yellow; color: black">PRODUCT DESCRIPTION</th>
-                    <th style="background-color: yellow; color: black">EDIT DETAILS</th>          
-                    </tr>
-                <%
-                    for(Product x: perm_pd) {
+                        for(Product x: perm_pd) {
                     	int p_id=x.getId();
                         String p_name=x.getName();
                         String p_pd=x.getPd();
                         Double p_price=x.getPrice();
                         int p_quant=x.getQuantity();
-                %>     
-                            <tr>
-                                <td><%=p_name%></td>
-                                <td><%=p_price%></td>
-                                <td><%=p_quant%></td>
-                                <td><%=p_pd%></td>
-                                <td>
-                                    <form action="editsellrproddet" method="post" style="font-size: 15px;">   
-                                        <div style="align-items: center">                                            
-                                            <input type="hidden" name="prod_id" value="<%=p_id%>">
-                                            <button type="submit"                                         
-                                                    style="padding: 10px; background: yellow; color: black;
-                                                    border: none; border-radius: 5px;">
-                                                <b>Edit Details</b>
-                                            </button>                                           
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>             
+                        String path=x.getImgp();
+                %>
+                <div class="product-card">
+			        <img src="<%=path%>" alt="Product <%=p_name%>">
+			        <h3><%=p_name%></h3>
+			        <p><%=p_pd%></p>
+			        <p class="extra-info">Remaining: <%=p_quant%></p>					        
+			        <span class="price">₹<%=p_price%></span>
+			        <div class="button-group">
+			        	<form action="editsellrproddet" method="post">					        		                     
+                                  <input type="hidden" name="prod_id" value="<%=p_id%>">
+                                   <button type="submit" href="editquantsellr" class="add-cart">                                       
+                                    Edit Details
+                                    </button>
+                                  </form>		                        
+			        </div>
+			      </div>                                             
                 <%
                         }
                     }
                 %>
-                </table>
+                </section>
             </div>
         </div>
         </body>

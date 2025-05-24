@@ -20,6 +20,8 @@ public class Seller {
 	
 	private String password;
 	
+	private String docs;
+	
 	private String perm;
 
 	public Seller() {
@@ -36,8 +38,20 @@ public class Seller {
 		return perm;
 	}
 
+	public String getDocs() {
+		return docs;
+	}
+
+	public void setDocs(String docs) {
+		this.docs = docs;
+	}
+
 	public void setPerm(String perm) {
 		this.perm = perm;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	public int getId() {
@@ -58,10 +72,6 @@ public class Seller {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 }

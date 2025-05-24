@@ -9,6 +9,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Seller Details</title>
+        <link rel="stylesheet" href="style1.css" />
     </head>
     	<%
     	Admin admi=(Admin)session.getAttribute("admin");
@@ -17,29 +18,14 @@
     	List<Product> plist=(List<Product>)request.getAttribute("nonpermprodfsid");
     	%>
         <body style="background-image: url(images/shop.jpg)">         
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
-            <h1>Welcome Admin <%=admi.getUsername() %></h1>
-        </div>
-       <div style="display: flex; align-items: left; font-size: 15px; 
-             background-color: white; flex-direction: column; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
-            <table style="border: 2px solid black; ; border-radius: 5px; justify-content: center; text-align: center">
-                   <tr>
-           				<td style="border: 1px solid black">Seller ID</td>
-           				<td style="border: 1px solid black"><%=s.getId() %></td>
-           				<td style="border: 1px solid black">Seller name</td>
-           				<td style="border: 1px solid black"><%=s.getName() %></td>
-           				<td style="border: 1px solid black">Seller mail</td>
-           				<td style="border: 1px solid black"><%=s.getEmail()%></td>
-           				<td style="border: 1px solid black">Permission</td>
-           				<td style="border: 1px solid black"><%=s.getPerm().equals("NO")?"Not Allowed":"Allowed" %></td>
-         			</tr>
-            </table>
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; 
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, Admin <%=admi.getUsername()%></h2>
+        </div>       
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; 
              background-color: white; flex-direction: column; 
-             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
+             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
             <th style="justify-content: center; text-align: justify; padding: 5px; background-color: cyan; 
@@ -60,60 +46,56 @@
                 <b>Pending Permission</b>
                 </a>
             </th>
+            <th style="justify-content: center;text-align: justify;padding: 5px; background-color: #c0c0c0; 
+                border-top-left-radius: 20px; border-top-right-radius: 20px; border: 1px solid black">
+                <a href="seller_det_page" style="color: black; text-decoration: none;">
+                <b>Details</b>
+                </a>
+            </th>
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center;text-align: justify;padding: 5px;
-                 background-color: black; color: yellow; width: 940px ">
+                 background-color: black; color: yellow; width: 1204px ">
+                 <section class="products">
                 <%
                     if(plist.isEmpty()){
                 %>
                     No objects present now
                 <%
-                    }else{
-                %>
-                <table style="border: 2px solid yellow; font-size: 48 px; border-radius: 5px; border-color: yellow; 
-                             background-color: black; text-align: center; color:yellow; justify-content: center;">
-                    <tr>
-                    <th style="background-color: yellow; color: black">PRODUCT ID</th>
-                    <th style="background-color: yellow; color: black">PRODUCT NAME</th>
-                    <th style="background-color: yellow; color: black">PRODUCT PRICE</th>
-                    <th style="background-color: yellow; color: black">PRODUCT DESCRIPTION</th>
-                    <th style="background-color: yellow; color: black">PRODUCT QUANTITY</th>
-                    <th style="background-color: yellow; color: black">PERMISSION</th>
-                    </tr>
-                <%
+                    }else{                
                     for(Product x: plist) {
                         String p_name=x.getName();
-                        String p_id=String.valueOf(x.getId());
+                        int p_id=x.getId();
                         String p_price=String.valueOf(x.getPrice());
                         String p_qty=String.valueOf(x.getQuantity());                        
                         String p_pd=x.getPd();
-                %>     
-                            <tr>
-                                <td><%=p_id%></td>
-                                <td><%=p_name%></td>
-                                <td><%=p_price%></td>
-                                <td><%=p_pd%></td>
-                                <td><%=p_qty%></td>                             
-                                <td>
-                                    <form action="Giveprodperm" method="post" style="font-size: 15px;">   
-                                        <div style="align-items: center">                                            
-                                            <input type="hidden" name="prodid" value="<%=p_id%>">
-                                            <button type="submit"                                         
-                                                    style="padding: 10px; background: yellow; color: black;
-                                                    border: none; border-radius: 5px;">
-                                                <b>Give permission</b>
-                                            </button>                                           
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>        
+                        String path=x.getImgp();
+                %>
+                <div class="product-card">
+			        <img src="<%=path%>" alt="Product <%=p_id%>">
+			        <h3><%=p_name%></h3>
+			        <p><%=p_pd%></p>
+			        <p class="extra-info">Remaining: <%=p_qty%></p>
+			        <span class="price">₹<%=p_price%></span>
+			        <div class="button-group">
+			        	<form action="Giveprodperm" method="post">   
+	                           <input type="hidden" name="prodid" value="<%=p_id%>">
+	                     		<button type="submit" class="add-cart">Approve</button>      
+	                       </form>			              
+			        </div>
+			      </div>     
+                                    
                 <%
                         }
                     }
                 %>
-                </table>
+                </section>
             </div>
         </div>
+        <script>			    
+			    setInterval(function() {
+			        location.reload();
+			    }, 5000);
+			</script>
         </body>    
 </html>

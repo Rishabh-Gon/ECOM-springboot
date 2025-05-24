@@ -17,7 +17,7 @@
         if(sellrperm.equals("NO")){
         %>
         <body>  
-        <h1>Welcome <%=sellrname%></h1>
+        <h1>Welcome to SwiftMart, <%=sellrname%></h1>
         <h2>Your request to do business is being evaluated. Contact with admin.</h2>
         <form action="Logout" method="post" style="font-size: 15px;">   
             <div style="align-items: center; margin-left: 250px">                       
@@ -30,14 +30,14 @@
         }else{
         %>
         <body style="background-image: url(images/shop.jpg)">         
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 810px">
-            <h1>Welcome <%=sellrname%></h1>
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, <%=sellrname%></h2>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; 
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; 
              background-color: white; flex-direction: column; 
-             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 810px">
+             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
             <th style="justify-content: center; text-align: justify; padding: 5px; background-color: cyan; 
@@ -55,7 +55,7 @@
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center;text-align: justify;padding: 5px;
-                 background-color: black; color: yellow; width: 800px ">
+                 background-color: black; color: yellow; width: 1204px ">
                 <%
                 	Product x=(Product)session.getAttribute("prod_edit_quant");
                     if(x==null){
@@ -70,9 +70,12 @@
                         String p_pd=x.getPd();
                         Double p_price=x.getPrice();
                         int p_quant=x.getQuantity();
+                        String pth=x.getImgp();
                 %>
-                <form action="editaddquantsellr" style="align-items: center; margin-left: 250px; font-size: 15px">
+                <form action="editaddquantsellr" method="post" style="align-items: center; margin-left: 250px; font-size: 15px">
                         <br>
+                        Product Image<br>
+                        <img alt="productimage" src="<%=pth%>" width="100" height="100"><br>
                         Product Name<br>
                         <div style="width: 200px">
                         <%=p_name %>

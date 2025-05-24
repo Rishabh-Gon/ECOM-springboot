@@ -11,6 +11,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Customer Details</title>
+        <link rel="stylesheet" href="stylecart.css" />
     </head>
     	<%
     	Admin admi=(Admin)session.getAttribute("admin");
@@ -18,27 +19,14 @@
     	List<Orderhist> op=(List<Orderhist>)request.getAttribute("ordhistofcust");
     	%>
         <body style="background-image: url(images/shop.jpg)">         
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 32px; 
+        <div style="display: inline-block; justify-content: center; text-align: center; 
             border-top-left-radius: 20px; background-color: white; flex-direction: column; 
-            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
-            <h1>Welcome Admin <%=admi.getUsername() %></h1>
+            border-top-right-radius: 20px; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px;">
+            <h2>Welcome to SwiftMart, Admin <%=admi.getUsername()%></h2>
         </div>
-        <div style="display: flex; align-items: left; font-size: 15px; 
-             background-color: white; flex-direction: column; margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
-            <table style="border: 2px solid black; ; border-radius: 5px; justify-content: center; text-align: center">
-                   <tr>
-           				<td style="border: 1px solid black">Customer ID </td>
-           				<td style="border: 1px solid black"><%=s.getId() %></td>
-           				<td style="border: 1px solid black">Customer name</td>
-           				<td style="border: 1px solid black"><%=s.getName() %></td>
-           				<td style="border: 1px solid black">Customer mail</td>
-           				<td style="border: 1px solid black"><%=s.getEmail()%></td>
-         			</tr>
-            </table>
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; 
+        <div style="display: inline-block; justify-content: center; align-items: center; font-size: 22px; 
              background-color: white; flex-direction: column; 
-             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 950px">
+             margin-left: auto; margin-right: auto; margin-bottom: auto; width: 1214px">
             <table style="margin-right: auto; margin-top: auto; border-spacing: 0px">
             <tr>
             <th style="justify-content: center; text-align: justify; padding: 5px; background-color: cyan; 
@@ -62,69 +50,89 @@
             </tr>
             </table>
             <div style="margin-bottom: auto; justify-content: center;text-align: justify;padding: 5px;
-                 background-color: black; color: yellow; width: 940px ">
+                 background-color: black; color: yellow; width: 1204px ">
+                 <section class="cart-items">
                 <%                    
                     if(op.isEmpty()){
                 %>
                     No objects present now
                 <%
-                    }else{
-                %>
-                <table style="border: 2px solid yellow; font-size: 48 px; border-radius: 5px; border-color: yellow; 
-                             background-color: black; color:yellow; justify-content: center; text-align: center">
-                    <tr>
-                    <th style="background-color: yellow; color: black">ORDER-ID</th>
-                    <th style="background-color: yellow; color: black">PRODUCT</th>
-                    <th style="background-color: yellow; color: black">PRICE</th>
-                    <th style="background-color: yellow; color: black">DESCRIPTION</th>                        
-                    <th style="background-color: yellow; color: black">SELLER</th>
-                    <th style="background-color: yellow; color: black">QTY</th>
-                    <th style="background-color: yellow; color: black">COST</th>
-                    <th style="background-color: yellow; color: black">DATE & TIME</th>                    
-                    </tr>
-                <%
-                    for(Orderhist x: op) {
-                    	int oid=x.getId();
-                        String p_name=x.getProductname();
-                        String p_pd=x.getProductdesc();
-                        Double p_price=x.getProductprice();
-                        int bqty=x.getBqty();                        
-                        int s_id=x.getSelrid();                        
-                        String s_name=x.getSellername();
-                        Double cost=p_price*bqty;
-                        String dt=x.getDatetime();
-                        Double taken=x.getTaken();
-                        Double ref=x.getRefunded();
-                %>     
-                <tr>
-                	<td><%=oid%></td>
-                    <td><%=p_name%></td>
-                    <td><%=p_price%></td>
-                    <td><%=p_pd%></td>
-                    <td>
-                    	ID-<%=s_id%><br>
-                    	<%=s_name%>
-                    </td>
-                    <td><%=bqty%></td>
-                    <td>
-                    	<%
-                    		if(ref>0){
-                		%>
-                			Refunded<br>
-	                  	<%
-	                    	}
-	                    %>                    
-                    	<%=cost%>
-                    </td>
-                    <td><%=dt%></td>             
-                </tr>    	
-                            	
-                <%
-                	}
-                }
-                %>
-                </table>
+                    }else{                
+                        for(Orderhist x: op) {
+                        	int oid=x.getId();
+                            String p_name=x.getProductname();
+                            String p_pd=x.getProductdesc();
+                            Double p_price=x.getProductprice();
+                            int bqty=x.getBqty();                        
+                            String s_name=x.getSellername();
+                            Double cost=p_price*bqty;
+                            String dt=x.getDatetime();
+                            Double taken=x.getTaken();
+                            Double ref=x.getRefunded();
+                            String statusw=x.getOrderstatus();
+                            String statusmessage="";
+                            if(statusw.equals("completed")){
+                            	if(ref>0.0)
+                            		statusmessage="Refunded";
+                            	else
+                            		statusmessage="Transaction done";
+                            }
+                            else if(statusw.equals("cancelled")){
+                            	statusmessage="Cancelled";
+                            }
+                            else if(statusw.equals("tfailed") && ref>0){
+                            	statusmessage="Transaction failed";
+                            }
+                            else if(statusw.equals("appeal")||statusw.equals("cnc")){
+                            	statusmessage="Cancel Requested";
+                            }
+                            else if(statusw.equals("ongoing")){
+                            	statusmessage="Ongoing Transaction";
+                            }
+                            else{
+                            	statusmessage="";
+                            }
+                    %>
+                    <div class="cart-item">
+    			        <img src="<%=x.getOimg()%>" alt="Order <%=oid%>" />
+    			        
+    			        <div class="cart-name-price">
+    			          <h2><%=p_name%></h2>
+    			          <p class="price">₹<%=cost%></p>
+    			        </div>
+    			
+	    			        <div class="cart-description">
+	    			          <p><%=p_pd%></p>
+	    			          <p class="seller-info">Seller: <%=s_name%></p>
+	    			          </div>
+	    			          <div class="cart-description">
+	    			          <p class="stock-info">Quantity: <%=bqty%></p>
+	    			          <p class="stock-info">Price: ₹<%=p_price%></p>
+	    			        	</div>
+	    			        <div class="cart-description">
+	    			          <p class="stock-info">Date and Time:<br>
+	    			           <%=dt%>
+	    			           </p>
+	    			        </div>
+	    			        <div class="cart-description">
+	    			          <p class="stock-info">Customer : <%=s.getName()%></p>
+	    			          <p class="stock-info">Customer mail: <%=s.getEmail()%></p>
+	    			          <p class="stock-info">Customer Id: <%=s.getId()%></p>
+	    			        	</div>   
+	                   		<div class="cart-description">
+	   				          <p class="stock-info"><b><%=statusmessage%></b></p>
+	   				        </div>
+                        </div>
+                        <%
+                        }}
+                    	%>
+                </section>
             </div>
         </div>
+        <script>			    
+			    setInterval(function() {
+			        location.reload();
+			    }, 5000);
+			</script>
         </body>    
 </html>

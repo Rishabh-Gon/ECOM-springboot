@@ -1,12 +1,20 @@
 package com.example.ecom.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.ecom.model.Product;
 import com.example.ecom.model.Seller;
@@ -46,9 +54,43 @@ public class SellerController {
 		return "seller_add_product";
 	}
 	
+	public boolean validEmail(String mail) {
+	    if (mail == null || mail.isEmpty()) {
+	        return false;
+	    }
+
+	    // Allowed email domains
+	    String[] allowedDomains = {"gmail.com", "rediffmail.com", "yahoomail.com"};
+
+	    // Split the email into two parts: local part and domain part
+	    int atIndex = mail.lastIndexOf('@');
+	    if (atIndex <= 0 || atIndex == mail.length() - 1) {
+	        return false; // Invalid if @ is missing, at the start, or end
+	    }
+
+	    String localPart = mail.substring(0, atIndex);
+	    String domainPart = mail.substring(atIndex + 1);
+
+	    // Check if domain is in the allowed list
+	    boolean isDomainValid = false;
+	    for (String domain : allowedDomains) {
+	        if (domain.equalsIgnoreCase(domainPart)) {
+	            isDomainValid = true;
+	            break;
+	        }
+	    }
+
+	    if (!isDomainValid) {
+	        return false;
+	    }
+
+	    return localPart.matches("^[A-Za-z0-9._%+-]+$");
+	}
+
+	
 	@RequestMapping("/RegisterSeller")
 	public String RegisterSeller(@RequestParam("seller_name")String sname,
-			@RequestParam("seller_mail")String smail,@RequestParam("seller_password")String spass,
+			@RequestParam("seller_mail")String smail,@RequestParam("seller_password")String spass, @RequestParam("pdfFile") MultipartFile pdfFile,
 			@RequestParam("seller_re_password")String sconfpass, ModelMap model ) 
 	{
 		if(spass.equals(sconfpass)==false) {											//passwords don't match
@@ -57,11 +99,31 @@ public class SellerController {
 		else if(srepo.existsByEmail(smail)) {								//email already exists
 			model.addAttribute("msg", "mxstfail");
 		}
-		//else if() {									//email format may not be correct		
-		//}
+		else if(validEmail(smail)== false) {
+			model.addAttribute("msg", "emfail");		
+		}
 		else {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(5);
+			spass=encoder.encode(spass);
 			Seller s=new Seller(sname, smail, spass);
-			srepo.save(s); 			
+			s=srepo.save(s); 			
+			try {
+				String fileName = "doc" +s.getId()+ ".pdf";
+
+		        // Target directory inside static or external path
+		        String uploadDir ="C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp\\sdocs";
+		        Path path = Paths.get(uploadDir, fileName);
+
+		        // Save PDF
+		        Files.copy(pdfFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+		        s.setDocs("/sdocs/"+fileName);
+		        srepo.save(s);
+			}
+			catch (IOException e) {
+				srepo.delete(s);
+				model.addAttribute("msg", "tfail");
+				return "register_seller";
+			}
 			model.addAttribute("msg", "success");
 		}
 		return "register_seller";
@@ -88,7 +150,7 @@ public class SellerController {
 	
 	@RequestMapping("/EdtProductSelr")
 	public String EdtProductSelr(@RequestParam("prod_name")String pname, @RequestParam("prod_quant")String pquant,
-			@RequestParam("product_price")String pprice,@RequestParam("product_pd")String ppd, 
+			@RequestParam("product_price")String pprice,@RequestParam("product_pd")String ppd, @RequestParam("product_image") MultipartFile image, 
 			HttpServletRequest request,HttpSession session) {
 		Product p=(Product)session.getAttribute("prod_edit");
 		request.setAttribute("msg", "Success");
@@ -120,6 +182,21 @@ public class SellerController {
 			catch(NumberFormatException e) {
 				request.setAttribute("msg", "Quantity must be a whole number");
 			}
+		}
+		try {
+			String originalFilename = image.getOriginalFilename();
+			if(originalFilename!=null) { 
+		        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+		        String newFileName = "img" + p.getId() + "." + extension;
+		        String uploadDir = "C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp\\prodimages";
+		        Path path = Paths.get(uploadDir, newFileName);
+		        Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+		        p.setImgp("/prodimages/" + newFileName);
+		        prepo.save(p);
+			}
+		}
+		catch(Exception e) {
+			request.setAttribute("msg", "Failed to add image");
 		}
 		prepo.save(p);
 		return "selreddet";		
@@ -165,20 +242,22 @@ public class SellerController {
 			@RequestParam("seller_password")String spass, ModelMap model,
 			HttpSession session,HttpServletRequest request) 
 	{
-		Seller seller=srepo.findByEmailAndPassword(smail,spass);
+		Seller seller=srepo.findByEmail(smail);
 		if(seller!=null) {
-			session.setAttribute("seller", seller);			
-		    return "redirect:/sellerhome";
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(5);
+			if (encoder.matches(spass, seller.getPassword())) {
+				session.setAttribute("seller", seller);			
+			    return "redirect:/sellerhome";
+		    }
 		}
-		else {
-			model.addAttribute("msg", "slfail");
-		}
+		model.addAttribute("msg", "slfail");
 		return "/seller_login";		
 	}
 	
 	@RequestMapping("/RegisterProduct")
 	public String RegisterProduct(@RequestParam("prod_name")String pname, @RequestParam("prod_quant")String pquant,
-			@RequestParam("product_price")String pprice,@RequestParam("product_pd")String ppd, 
+			@RequestParam("product_price")String pprice,@RequestParam("product_pd")String ppd, @RequestParam("product_image") MultipartFile image,
+
 			ModelMap model,HttpSession session) 
 	{
 		double prod_price=0.0;
@@ -188,24 +267,41 @@ public class SellerController {
 		}
 		catch(NumberFormatException E) {
 			model.addAttribute("addProdmsg", "Price must be a numerical value");
-			return "/seller_add_product";
+			return "seller_add_product";
 		}
 		try {
 			prod_quantity=Integer.parseInt(pquant);			
 		}
 		catch(NumberFormatException E) {
 			model.addAttribute("addProdmsg", "Quantity must be a whole value");
-			return "/seller_add_product";
+			return "seller_add_product";
 		}
 		if(prod_quantity<1) {
 			model.addAttribute("addProdmsg", "Quantity must be equal or greater than 1");
-			return "/seller_add_product";
+			return "seller_add_product";
 		}
 		Seller s=(Seller)session.getAttribute("seller");
 		Product p=new Product(s, pname, prod_price, ppd, prod_quantity);
-		prepo.save(p);
+		p=prepo.save(p);
+		
+		int prodid=p.getId();
+		try {
+	        String originalFilename = image.getOriginalFilename();
+	        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+	        String newFileName = "img" + prodid + "." + extension;
+	        String uploadDir = "C:\\Users\\RG\\Desktop\\college_proj\\Ecom\\src\\main\\webapp\\prodimages";
+	        Path path = Paths.get(uploadDir, newFileName);
+	        Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+	        p.setImgp("/prodimages/" + newFileName);
+	        prepo.save(p);
+	        model.addAttribute("addProdmsg", "Added");
+		} catch(Exception e) {
+			model.addAttribute("addProdmsg", "Problem in adding image");
+			throw new RuntimeException("Image upload failed", e);	
+		}
+		
 		model.addAttribute("addProdmsg", "Added");
-		return "/seller_add_product";
+		return "seller_add_product";
 	}
 	
 	@RequestMapping("/seller_permission_pending")
